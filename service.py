@@ -18,7 +18,7 @@ def home(my_query, q:Optional[str]=None):
     return {"result":"sucess","user_input":my_query,"query":q}
 
 
-@app.put("/endpoint2")
+@app.put("/endpoint")
 async def endpoint( resume: CV):
     "some code db here"
     return {"username": resume.name}
