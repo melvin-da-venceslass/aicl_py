@@ -1,10 +1,31 @@
-from fastapi import FastAPI
+from optparse import Option
+from xmlrpc.client import Boolean
+from fastapi import FastAPI,Request
+
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
 from typing import Optional
 from pydantic import BaseModel
 import pybase64
 import time
 
+
+#HTML LIBRARY
+from fastapi.responses import HTMLResponse  #to render the ouput in HTML format text - html
+from fastapi.staticfiles import StaticFiles #to access the files and folders that web app needs
+from fastapi.templating import Jinja2Templates #  #to render the ouput in HTML format -  file to html
+
+
+
+
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+templates = Jinja2Templates(directory="templates")
+
 
 class CV(BaseModel):
    name:str
@@ -66,7 +87,22 @@ async def msep(token:str,field1:str, field2:str,):
     return {"server_pass":authorisation}
      
 
+@app.get("/webpage", response_class=HTMLResponse)
+async def webpage():
+    html_code = """
+            <html>
+            <head>
+            </head>
+            <body>
+            <h1>Hello Folks
+            </body>
+            </html>
     
-    
+     """
+    return html_code
 
- 
+
+@app.get("/filehtml", response_class=HTMLResponse)
+async def webpage(request:Request):
+    return templates.TemplateResponse('index.html', context={'request': request})
+
