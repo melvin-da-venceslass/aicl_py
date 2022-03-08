@@ -1,3 +1,4 @@
+from lib2to3.pytree import Base
 from optparse import Option
 from xmlrpc.client import Boolean
 from fastapi import FastAPI,Request
@@ -5,6 +6,8 @@ from fastapi import FastAPI,Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+
 
 from typing import Optional
 from pydantic import BaseModel
@@ -102,7 +105,46 @@ async def webpage():
     return html_code
 
 
-@app.get("/filehtml", response_class=HTMLResponse)
+
+class usr(BaseModel):
+    name:str
+    password:str
+    email:str
+
+
+@app.get("/login", response_class=HTMLResponse)
 async def webpage(request:Request):
     return templates.TemplateResponse('index.html', context={'request': request})
 
+
+
+
+@app.post("/create_user")
+async def create_user(user:usr):
+
+    userdb = eval(open("userdb.json","r").read())
+
+    user_profile = {"name":user.name,
+                    "password":user.password,
+                    "email":user.email}
+
+    userdb["users"].append(user_profile)
+    open("userdb.json","w+").write(str(userdb))
+    return {"status":"success"}
+
+class usr_login(BaseModel):
+    name:str
+    password:str
+
+@app.post("/login_user")
+async def create_user(user:usr_login):
+ 
+
+    userdb = eval(open("userdb.json","r").read())
+    
+    for each in  userdb["users"]:
+        if each["name"]==user.name and each["password"]==user.password:
+            return {"status":"Login Success"}
+        else:
+            pass
+    return {"status":"Login Failure"}
